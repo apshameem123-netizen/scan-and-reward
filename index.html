@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coca-Cola | Scan & Engage</title>
+<style>
+:root{
+  --red:#f40009;--red2:#b90008;--black:#080808;--panel:#111;
+  --panel2:#171717;--white:#fff;--muted:#a7a7a7;--line:#2b2b2b;
+  --green:#39d98a;--gold:#f4c95d;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,Helvetica,sans-serif;background:#050505;color:#fff;min-height:100vh}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.app{max-width:520px;margin:auto;min-height:100vh;background:#090909;box-shadow:0 0 80px rgba(0,0,0,.5)}
+.topbar{position:sticky;top:0;z-index:20;height:64px;background:rgba(8,8,8,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 20px}
+.brand{display:flex;align-items:center;gap:9px;font-weight:900;font-size:15px}
+.logo{width:31px;height:31px;border-radius:50%;background:var(--red);display:grid;place-items:center}
+.points{background:#191919;border:1px solid #353535;border-radius:20px;padding:7px 11px;font-size:11px;font-weight:800}
+.points span{color:var(--gold)}
+.screen{display:none;padding-bottom:35px;min-height:calc(100vh - 64px)}
+.screen.active{display:block}
+.hero{padding:34px 22px 28px;text-align:center;background:radial-gradient(circle at 50% 0,rgba(244,0,9,.24),transparent 45%),#090909}
+.badge{display:inline-block;padding:7px 11px;border-radius:20px;background:rgba(244,0,9,.13);border:1px solid rgba(244,0,9,.35);color:#ff6268;font-size:10px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase}
+.hero h1{font-size:37px;line-height:1.03;letter-spacing:-2px;margin:18px 0 10px}
+.hero h1 span{color:var(--red)}
+.hero p{color:#aaa;font-size:14px;line-height:1.6}
+.product{margin:0 18px;border-radius:22px;min-height:250px;background:linear-gradient(145deg,#1a1a1a,#101010);border:1px solid #292929;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.product:before{content:"";position:absolute;width:210px;height:210px;border-radius:50%;background:rgba(244,0,9,.13);top:-80px;right:-60px}
+.bottle{width:92px;height:160px;background:linear-gradient(90deg,#b60007,#f40009,#a80006);border-radius:24px 24px 20px 20px;position:relative;box-shadow:0 18px 40px rgba(0,0,0,.45)}
+.bottle:before{content:"";position:absolute;width:45px;height:20px;background:#e8e8e8;top:-11px;left:24px;border-radius:5px 5px 3px 3px}
+.bottle:after{content:"COKE";position:absolute;left:9px;right:9px;top:63px;background:#fff;color:#e00008;font-weight:900;font-size:12px;padding:7px 2px;border-radius:5px;text-align:center;transform:rotate(-7deg)}
+.product h3{margin-top:15px;font-size:17px}.product small{color:#888;margin-top:3px}
+.cta{display:block;width:calc(100% - 36px);margin:18px auto 0;border:0;border-radius:13px;padding:15px;background:var(--red);color:#fff;font-weight:900;font-size:14px}
+.cta:hover{background:#ff1b23}
+.secondary{background:#171717;border:1px solid #383838}
+.content{padding:22px 20px}
+.progress{height:5px;background:#262626;border-radius:10px;margin-bottom:22px;overflow:hidden}.progress span{display:block;height:100%;width:25%;background:var(--red)}
+.step{color:#888;font-size:10px;text-transform:uppercase;letter-spacing:1.3px;font-weight:800;margin-bottom:8px}
+h2{font-size:26px;line-height:1.1;margin-bottom:9px;letter-spacing:-1px}
+.lead{color:#999;font-size:13px;line-height:1.6;margin-bottom:20px}
+.options{display:grid;gap:10px}
+.option{background:#141414;border:1px solid #303030;border-radius:12px;color:#eee;text-align:left;padding:15px;transition:.2s}
+.option:hover,.option.selected{border-color:var(--red);background:rgba(244,0,9,.09)}
+.option strong{display:block;font-size:14px;margin-bottom:3px}.option small{color:#888;font-size:11px}
+textarea,input{width:100%;background:#111;border:1px solid #383838;color:#fff;border-radius:12px;padding:14px;outline:none}
+textarea{min-height:130px;resize:vertical}input:focus,textarea:focus{border-color:var(--red)}
+.rating{display:flex;justify-content:space-between;gap:7px;margin:16px 0}.star{width:48px;height:48px;border:1px solid #333;background:#151515;border-radius:12px;color:#777;font-size:20px}.star.selected{border-color:var(--gold);background:rgba(244,201,93,.1);color:var(--gold)}
+.field{margin:15px 0}.field label{display:block;color:#bbb;font-size:11px;margin-bottom:7px}
+.reward{text-align:center;padding:25px 20px}
+.reward-icon{width:70px;height:70px;border-radius:50%;margin:auto;background:rgba(244,0,9,.12);display:grid;place-items:center;font-size:34px}
+.reward h2{margin-top:17px}.reward .big{font-size:48px;font-weight:900;color:var(--gold);margin:12px 0}
+.reward-card{background:#151515;border:1px solid #303030;border-radius:17px;padding:18px;text-align:left;margin-top:18px}.reward-card strong{font-size:15px}.reward-card p{font-size:12px;color:#999;line-height:1.6;margin-top:6px}
+.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.choice{background:#151515;border:1px solid #303030;border-radius:13px;padding:15px;color:#fff;text-align:left}.choice.selected{border-color:var(--red);background:rgba(244,0,9,.08)}.choice b{display:block;margin-bottom:5px}.choice span{font-size:11px;color:#888}
+.success{text-align:center;padding:40px 24px}.check{width:76px;height:76px;border-radius:50%;background:rgba(57,217,138,.12);border:1px solid rgba(57,217,138,.35);color:var(--green);display:grid;place-items:center;font-size:35px;margin:0 auto 20px}.success h2{font-size:31px}.success p{color:#999;font-size:13px;line-height:1.7;margin:10px auto 20px;max-width:390px}
+.receipt{background:#151515;border:1px solid #303030;border-radius:16px;padding:18px;text-align:left}.receipt-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #292929;font-size:12px}.receipt-row:last-child{border:0}.receipt-row span{color:#888}
+
+.scan-box{margin:20px 0 14px;background:linear-gradient(145deg,#151515,#0f0f0f);border:1px solid #303030;border-radius:18px;padding:18px}
+.scan-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.scan-btn{border:1px solid #3b3b3b;background:#191919;color:#fff;border-radius:12px;padding:14px 10px;font-weight:800;font-size:12px}
+.scan-btn.primary{background:var(--red);border-color:var(--red)}
+#photoInput{display:none}
+.preview{display:none;margin-top:14px;border-radius:14px;overflow:hidden;border:1px solid #333;background:#0b0b0b}
+.preview img{width:100%;max-height:220px;object-fit:contain;display:block}
+.detected{display:none;margin-top:12px;padding:12px;border-radius:12px;background:rgba(57,217,138,.08);border:1px solid rgba(57,217,138,.25);font-size:12px;color:#b7f5d5}
+.product-list{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:12px}
+.product-choice{border:1px solid #303030;background:#151515;color:#fff;border-radius:11px;padding:12px;text-align:left}
+.product-choice.selected{border-color:var(--red);background:rgba(244,0,9,.09)}
+.product-choice strong{display:block;font-size:12px}.product-choice small{color:#888;font-size:10px}
+.celebration{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.72);backdrop-filter:blur(5px);overflow:hidden}
+.celebration.show{display:flex}
+.celebrate-card{width:min(410px,90%);background:#151515;border:1px solid #3a3a3a;border-radius:24px;padding:32px 24px;text-align:center;position:relative;z-index:3;animation:popIn .55s cubic-bezier(.17,.89,.32,1.3)}
+.celebrate-icon{font-size:58px;animation:bounce .9s ease infinite alternate}
+.celebrate-card h2{font-size:31px;margin:10px 0}.celebrate-card p{color:#aaa;font-size:13px;line-height:1.6}
+.celebrate-points{font-size:46px;font-weight:900;color:var(--gold);margin:12px 0}
+.balloon{position:absolute;bottom:-130px;width:48px;height:62px;border-radius:50% 50% 45% 45%;animation:floatUp 4.2s ease-in forwards}
+.balloon:after{content:"";position:absolute;bottom:-42px;left:50%;width:1px;height:45px;background:#aaa}
+.b1{left:5%;background:#f40009}.b2{left:18%;background:#f4c95d;animation-delay:.45s}.b3{left:33%;background:#39d98a;animation-delay:.2s}.b4{left:51%;background:#6c63ff;animation-delay:.7s}.b5{left:67%;background:#ff7aa2;animation-delay:.35s}.b6{left:82%;background:#ff9f43;animation-delay:.8s}
+@keyframes popIn{0%{opacity:0;transform:scale(.65) translateY(20px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes bounce{from{transform:translateY(0) rotate(-4deg)}to{transform:translateY(-9px) rotate(4deg)}}
+@keyframes floatUp{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(-125vh) rotate(25deg);opacity:.95}}
+@media(max-width:380px){.scan-actions,.product-list{grid-template-columns:1fr}}
+
+.footer{text-align:center;color:#555;font-size:10px;padding:20px;border-top:1px solid #222;margin-top:20px}
+.back{color:#888;font-size:11px;text-decoration:none;display:inline-block;margin-bottom:18px}.back:hover{color:#fff}
+@media(max-width:380px){.hero h1{font-size:32px}.star{width:43px;height:43px}.choice-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header class="topbar">
+  <div class="brand"><div class="logo">C</div> COCA-COLA</div>
+  <div class="points">⭐ <span id="pointsTop">0</span> points</div>
+</header>
+
+<!-- SCREEN 1: QR LANDING -->
+<section id="home" class="screen active">
+  <div class="hero">
+    <div class="badge">You scanned a Coca-Cola QR code</div>
+    <h1>Scan.<br><span>Share.</span><br>Get Rewarded.</h1>
+    <p>Tell us what you think about your Coca-Cola experience and earn points for taking part.</p>
+  </div>
+
+  <div class="product">
+    <div class="bottle"></div>
+    <h3>Coca-Cola Original</h3>
+    <small>Customer Experience Check-in</small>
+  </div>
+
+  <button class="cta" onclick="go('identify')">Scan / Select My Product →</button>
+  <button class="cta secondary" onclick="go('rewards')">View My Rewards</button>
+
+  <div class="content">
+    <div class="reward-card">
+      <strong>How it works</strong>
+      <p>1. Scan or select your product · 2. Share your feedback · 3. Earn points · 4. Redeem your reward.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- SCREEN 1B: PRODUCT IDENTIFICATION -->
+<section id="identify" class="screen">
+  <div class="content">
+    <a href="#" class="back" onclick="go('home');return false">← Back</a>
+    <div class="progress"><span style="width:15%"></span></div>
+    <div class="step">Start · Identify your product</div>
+    <h2>What did you scan?</h2>
+    <p class="lead">Use your camera/photo option if available, or simply select the Coca-Cola product below for this demo.</p>
+
+    <div class="scan-box">
+      <div class="step">Option 1 · Scan / upload product photo</div>
+      <div class="scan-actions">
+        <button class="scan-btn primary" onclick="document.getElementById('photoInput').click()">📷 Scan / Take Photo</button>
+        <button class="scan-btn" onclick="document.getElementById('photoInput').click()">🖼️ Upload Photo</button>
+      </div>
+      <input id="photoInput" type="file" accept="image/*" capture="environment" onchange="handlePhoto(event)">
+      <div class="preview" id="photoPreview"><img id="previewImage" alt="Product photo preview"></div>
+      <div class="detected" id="detectedMessage">✓ Product photo added. For this prototype, please confirm the product below.</div>
+    </div>
+
+    <div class="scan-box">
+      <div class="step">Option 2 · Select a product</div>
+      <div class="product-list">
+        <button class="product-choice selected" onclick="selectProduct(this,'Coca-Cola Original')"><strong>🥤 Coca-Cola Original</strong><small>Classic Coca-Cola</small></button>
+        <button class="product-choice" onclick="selectProduct(this,'Coca-Cola Zero Sugar')"><strong>🥤 Coca-Cola Zero Sugar</strong><small>Zero Sugar</small></button>
+        <button class="product-choice" onclick="selectProduct(this,'Sprite')"><strong>🍋 Sprite</strong><small>Lemon-lime refreshment</small></button>
+        <button class="product-choice" onclick="selectProduct(this,'Fanta')"><strong>🍊 Fanta</strong><small>Fruit-flavored refreshment</small></button>
+      </div>
+    </div>
+
+    <button class="cta" onclick="confirmProduct()">Continue with <span id="selectedProductLabel">Coca-Cola Original</span> →</button>
+  </div>
+</section>
+
+<!-- SCREEN 2: EXPERIENCE -->
+<section id="experience" class="screen">
+  <div class="content">
+    <a href="#" class="back" onclick="go('home');return false">← Back</a>
+    <div class="progress"><span style="width:25%"></span></div>
+    <div class="step">Step 1 of 4 · Your experience</div>
+    <h2>How was your Coca-Cola?</h2>
+    <p class="lead">Choose the option that best describes your experience today.</p>
+
+    <div class="options" id="experienceOptions">
+      <button class="option" onclick="selectOption(this,'experience')"><strong>😍 Excellent</strong><small>I really enjoyed it.</small></button>
+      <button class="option" onclick="selectOption(this,'experience')"><strong>😊 Good</strong><small>It was a good experience.</small></button>
+      <button class="option" onclick="selectOption(this,'experience')"><strong>😐 Okay</strong><small>It was fine, but could be better.</small></button>
+      <button class="option" onclick="selectOption(this,'experience')"><strong>😕 Not good</strong><small>I was not fully satisfied.</small></button>
+    </div>
+
+    <button class="cta" onclick="nextFromExperience()">Continue →</button>
+  </div>
+</section>
+
+<!-- SCREEN 3: PRODUCT FEEDBACK -->
+<section id="product" class="screen">
+  <div class="content">
+    <a href="#" class="back" onclick="go('experience');return false">← Back</a>
+    <div class="progress"><span style="width:50%"></span></div>
+    <div class="step">Step 2 of 4 · Product feedback</div>
+    <h2>Tell us what you noticed.</h2>
+    <p class="lead">Your feedback helps the brand understand what customers value.</p>
+
+    <div class="field">
+      <label>What did you like most?</label>
+      <div class="choice-grid">
+        <button class="choice" onclick="choose(this)"><b>🥤 Taste</b><span>Flavor & refreshment</span></button>
+        <button class="choice" onclick="choose(this)"><b>🧊 Refreshment</b><span>Cold & refreshing</span></button>
+        <button class="choice" onclick="choose(this)"><b>📦 Packaging</b><span>Design & convenience</span></button>
+        <button class="choice" onclick="choose(this)"><b>❤️ Brand</b><span>Overall experience</span></button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>How likely are you to choose Coca-Cola again?</label>
+      <div class="rating" id="repeatRating">
+        <button class="star" onclick="rate(this,1)">1</button>
+        <button class="star" onclick="rate(this,2)">2</button>
+        <button class="star" onclick="rate(this,3)">3</button>
+        <button class="star" onclick="rate(this,4)">4</button>
+        <button class="star" onclick="rate(this,5)">5</button>
+      </div>
+    </div>
+
+    <button class="cta" onclick="go('feedback')">Continue →</button>
+  </div>
+</section>
+
+<!-- SCREEN 4: OPEN FEEDBACK -->
+<section id="feedback" class="screen">
+  <div class="content">
+    <a href="#" class="back" onclick="go('product');return false">← Back</a>
+    <div class="progress"><span style="width:75%"></span></div>
+    <div class="step">Step 3 of 4 · Customer voice</div>
+    <h2>Anything else you want us to know?</h2>
+    <p class="lead">Tell us what you loved, what could improve, or what you would like to see from Coca-Cola.</p>
+
+    <textarea id="feedbackText" placeholder="Write your feedback here..."></textarea>
+
+    <div class="field">
+      <label>What would make your next experience better?</label>
+      <div class="options">
+        <button class="option" onclick="selectOption(this,'improve')"><strong>🎁 Better rewards</strong></button>
+        <button class="option" onclick="selectOption(this,'improve')"><strong>🧃 More product choices</strong></button>
+        <button class="option" onclick="selectOption(this,'improve')"><strong>📱 More digital experiences</strong></button>
+        <button class="option" onclick="selectOption(this,'improve')"><strong>✨ Better promotions</strong></button>
+      </div>
+    </div>
+
+    <button class="cta" onclick="submitFeedback()">Submit & Get My Reward →</button>
+  </div>
+</section>
+
+<!-- SCREEN 5: REWARD -->
+<section id="reward" class="screen">
+  <div class="success">
+    <div class="check">✓</div>
+    <div class="badge">Feedback received</div>
+    <h2>Thank you for sharing.</h2>
+    <p>Your feedback has been recorded. You have earned points for participating in the Coca-Cola customer experience.</p>
+
+    <div class="reward-card">
+      <div class="step">Your reward</div>
+      <div class="big">+50</div>
+      <strong>Coca-Cola Reward Points</strong>
+      <p>Use your points for available digital rewards, discounts and experiences.</p>
+    </div>
+
+    <button class="cta" onclick="go('rewards')">View My Rewards →</button>
+    <button class="cta secondary" onclick="go('home')">Finish</button>
+  </div>
+</section>
+
+<!-- SCREEN 6: REWARDS -->
+<section id="rewards" class="screen">
+  <div class="content">
+    <a href="#" class="back" onclick="go('home');return false">← Back to Home</a>
+    <div class="step">My Coca-Cola Rewards</div>
+    <h2>Make your points count.</h2>
+    <p class="lead">Keep scanning participating products and completing activities to earn more points.</p>
+
+    <div class="reward-card" style="text-align:center">
+      <div class="step">Available points</div>
+      <div class="big" id="rewardBalance">0</div>
+      <small style="color:#888">points</small>
+    </div>
+
+    <div class="field">
+      <label>Available rewards</label>
+      <div class="options">
+        <button class="option"><strong>📱 500MB Data Bundle</strong><small>250 points · Redeem</small></button>
+        <button class="option"><strong>🎟️ Event Experience</strong><small>500 points · Redeem</small></button>
+        <button class="option"><strong>🥤 Coca-Cola Voucher</strong><small>350 points · Redeem</small></button>
+      </div>
+    </div>
+
+    <button class="cta" onclick="go('home')">Scan Another Product →</button>
+  </div>
+</section>
+
+
+<!-- SUBMISSION CELEBRATION -->
+<div class="celebration" id="celebration">
+  <div class="balloon b1"></div><div class="balloon b2"></div><div class="balloon b3"></div>
+  <div class="balloon b4"></div><div class="balloon b5"></div><div class="balloon b6"></div>
+  <div class="celebrate-card">
+    <div class="celebrate-icon">🎉</div>
+    <div class="badge">Feedback submitted</div>
+    <h2>You did it!</h2>
+    <p>Thank you for sharing your Coca-Cola experience. Your voice helps us learn, improve and create better experiences.</p>
+    <div class="celebrate-points">+50</div>
+    <p>Coca-Cola Reward Points</p>
+  </div>
+</div>
+
+<div class="footer">Coca-Cola Customer Experience Concept · Your feedback helps us learn, improve and engage better.</div>
+</div>
+
+<script>
+let points=0;
+let experienceSelected=false;
+let repeatScore=0;
+let selectedProduct='Coca-Cola Original';
+
+
+function handlePhoto(event){
+  const file=event.target.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(e){
+    document.getElementById('previewImage').src=e.target.result;
+    document.getElementById('photoPreview').style.display='block';
+    document.getElementById('detectedMessage').style.display='block';
+  };
+  reader.readAsDataURL(file);
+}
+function selectProduct(btn,name){
+  document.querySelectorAll('.product-choice').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedProduct=name;
+  document.getElementById('selectedProductLabel').textContent=name;
+}
+function confirmProduct(){ go('experience'); }
+
+function go(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top:0,behavior:'smooth'});
+  updatePoints();
+}
+
+function selectOption(btn,type){
+  document.querySelectorAll('#'+type+' .option').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+  if(type==='experience') experienceSelected=true;
+}
+
+function choose(btn){
+  const parent=btn.parentElement;
+  parent.querySelectorAll('.choice').forEach(b=>b.classList.remove('selected'));
+  btn.classList.add('selected');
+}
+
+function rate(btn,value){
+  repeatScore=value;
+  document.querySelectorAll('#repeatRating .star').forEach((b,i)=>b.classList.toggle('selected',i<value));
+}
+
+function nextFromExperience(){
+  if(!experienceSelected){
+    alert('Please choose an option before continuing.');
+    return;
+  }
+  go('product');
+}
+
+function submitFeedback(){
+  const text=document.getElementById('feedbackText').value.trim();
+  if(!text){
+    alert('Please share a short piece of feedback before submitting.');
+    document.getElementById('feedbackText').focus();
+    return;
+  }
+  points+=50;
+  document.getElementById('celebration').classList.add('show');
+  setTimeout(()=>{
+    document.getElementById('celebration').classList.remove('show');
+    go('reward');
+  },3600);
+}
+
+function updatePoints(){
+  document.getElementById('pointsTop').textContent=points;
+  document.getElementById('rewardBalance').textContent=points;
+}
+</script>
+</body>
+</html>
